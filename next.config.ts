@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
+  allowedDevOrigins: ["192.168.110.8"], // Add your local network IP here
   experimental: {
     agentFeedback: true,
   },
