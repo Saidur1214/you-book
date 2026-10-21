@@ -115,5 +115,6 @@ export async function POST(req: Request) {
             { error: error.message || "Failed to generate content" },
             { status: error.status || 500 }
         );
+        console.log("hello")
     }
 }
