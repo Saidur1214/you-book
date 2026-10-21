@@ -58,14 +58,6 @@ export async function POST(req: Request) {
                         text: "Please watch this video and retell the story following the system instructions.",
                     },
                 ];
-                return NextResponse.json(
-                    {
-                        error:
-                            "Could not retrieve captions/transcript for this YouTube video. Please ensure the video has English captions available, or paste the transcript directly.",
-                    },
-                    { status: 400 }
-
-                );
             }
         }
 
