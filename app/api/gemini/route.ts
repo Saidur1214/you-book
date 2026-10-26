@@ -1,6 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
-import { YoutubeTranscript } from "youtube-transcript";
 import { serverClient } from "@/lib/server";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
@@ -14,13 +13,11 @@ export async function POST(req: Request) {
         }
 
         const body = await req.json();
-        const inputUrl = body?.url || body?.URL;
+        const inputUrl = body?.url;
 
         if (!inputUrl) {
             return NextResponse.json({ error: "URL is required" }, { status: 400 });
         }
-
-        console.log("👉 URL received from form for user", user.id, ":", inputUrl);
 
         const model = genAI.getGenerativeModel({
             model: "gemini-3.1-flash-lite",
@@ -31,55 +28,41 @@ export async function POST(req: Request) {
         const isYouTube =
             typeof inputUrl === "string" &&
             (inputUrl.includes("youtube.com") || inputUrl.includes("youtu.be"));
-        let contentToAnalyze = inputUrl;
+        let text
 
         if (isYouTube) {
             try {
-                console.log("⏳ Fetching YouTube transcript...");
-                const transcriptData = await YoutubeTranscript.fetchTranscript(inputUrl);
-                const rawTranscript = transcriptData.map((item) => item.text).join(" ");
+                let result;
+                let attempts = 3;
 
-                if (!rawTranscript || rawTranscript.trim().length === 0) {
-                    throw new Error("Transcript is empty");
+                while (attempts > 0) {
+                    try {
+                        result = await model.generateContent([
+                            {
+                                fileData: {
+                                    fileUri: inputUrl,
+                                    mimeType: "video/mp4"
+                                },
+
+                            },
+                            "Give me summary of this video"
+                        ]);
+                        text = result?.response.text() || "";
+                        break;
+                    } catch (err: any) {
+                        attempts--;
+                        if (attempts === 0 || err?.status !== 503) throw err;
+                        await new Promise((resolve) => setTimeout(resolve, 2000));
+                    }
                 }
 
-                console.log(`✅ Successfully extracted transcript (${rawTranscript.length} characters)`);
-                contentToAnalyze = `VIDEO LINK: ${inputUrl}\n\nTRANSCRIPT:\n${rawTranscript}`;
+
             } catch (err: any) {
-                console.warn("⚠️ Could not fetch transcript from YouTube:", err?.message);
-                contentToAnalyze = [
-                    {
-                        fileData: {
-                            fileUri: inputUrl,
-                            mimeType: "video/mp4",
-                        },
-                    },
-                    {
-                        text: "Please watch this video and retell the story following the system instructions.",
-                    },
-                ];
+                console.warn("Could not fetch transcript from YouTube:", err?.message);
             }
         }
 
-        let result;
-        let attempts = 3;
 
-        while (attempts > 0) {
-            try {
-                result = await model.generateContent(contentToAnalyze!);
-                break;
-            } catch (err: any) {
-                attempts--;
-                if (attempts === 0 || err?.status !== 503) throw err;
-                await new Promise((resolve) => setTimeout(resolve, 2000));
-            }
-        }
-
-        const text = result?.response.text() || "";
-        console.log("--- Gemini Response Received ---");
-        console.log(text);
-
-        // 4. Save the generated story into the posts table with the user's uid
         const { data: postData, error: postError } = await supabase
             .from("posts")
             .insert([
@@ -94,14 +77,11 @@ export async function POST(req: Request) {
             .single();
 
         if (postError) {
-            console.error("❌ Error saving to posts table:", postError);
             return NextResponse.json(
                 { error: postError.message || "Failed to save post to database" },
                 { status: 500 }
             );
         }
-
-        console.log("✅ Post saved successfully to posts table with ID:", postData.id);
 
         return NextResponse.json({
             success: true,
@@ -110,9 +90,8 @@ export async function POST(req: Request) {
         });
 
     } catch (error: any) {
-        console.error("Gemini API Error:", error);
         return NextResponse.json(
-            { error: error.message || "Failed to generate content" },
+            { error: error || "Failed to generate content" },
             { status: error.status || 500 }
         );
     }
