@@ -18,6 +18,7 @@ export default async function Feed() {
         .from('posts')
         .select('*')
         .eq('uid', user.id)
+        .eq('status', 'processed')
         .order('created_at', { ascending: false });
 
     if (postError) {

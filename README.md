@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Update 1 - Major UI/UX fix 
+[Deadline: --/--/--]
 
-## Getting Started
+## Update to work on
+    - [ ] Add option to create Name
+    - [ ] When name is provided, create a custom profile with the first letter of the name
+    - [ ] 
 
-First, run the development server:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Update in Queue
+    - [ ] Check whether the URL already exists in the DB
+    - [ ] If it does, show the existing post instead of creating a new one
+    - [ ] Track read vs unread posts (button for now)
+    - [ ] Show unread posts on top of the feed
+    - [ ] ...
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### V1.1 [Done]
+    - [done] Don't disable the send button; clear the URL bar after submit
+    - [done] Let users add more URLs while one is processing
+    - [done] Store queued URLs (server-side, so they survive a closed tab)
+    - [done] Process the next URL as soon as the previous one finishes
+    - [done] Let users read previous posts during the wait
+    - [done] Rename "ai" to "AI"
+    - [done] Show a placeholder card or progress status in the feed while waiting
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Working On -> v1.2
+    - [ ] Create a function to generate a subject for each post
+    - [ ] Work On mobile UI
+    - [ ] Create a floating window in mobile UI
+    - [ ] Add Sign Out button, Progress Tab, Add Resource
+    - [ ] Don't Hide the Float winodow instantly when user click submit
 
-## Learn More
 
-To learn more about Next.js, take a look at the following resources:
+### Today: Build the Whop checkout page
+   - [ ] Create a separate branch from master just for the checkout work
+   - [ ] Implement the Whop checkout page on that branch
+   - [ ] Push the checkout update from that branch into main
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+
+
+
+### Re-check the “empty template” bug (before final production)
+    - [ ] Reproduce it: submit a URL → button disables while the video processes → press Back
+    - [ ] What goes wrong: the floating window disappears and a permanent empty template stays in the feed.
+    - [ ] Suspicion: it may already be fixed in the v1.1 update, but that’s unconfirmed.
+    - [ ] Test it on v1.1 before the software goes to final production. If it still happens, treat it as a blocker, because a stuck empty card in the feed will be visible to real users.
+
+### Future Plan
+    - [ ] Add like/dislike buttons to learn user taste and add variety
+    - [ ] Study hook methods to make posts more engaging
+    - [ ] Build an admin panel to manage users
+    - [ ] Send all queued URLs in one click and split them into separate posts
+    - [ ] Generate 2 posts per URL: show one, store the other for the next login
