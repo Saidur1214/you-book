@@ -39,7 +39,7 @@ export async function proxy(request: NextRequest) {
     const path = request.nextUrl.pathname;
 
     // Note: Add any route here that should NOT require login
-    const publicRoutes = ["/log-in", "/sign-in"];
+    const publicRoutes = ["/log-in", "/sign-in", "/api/webhooks"];
     const isPublicPath = publicRoutes.some((route) => path.startsWith(route));
 
     // Block unauthenticated access to ALL private routes
@@ -69,5 +69,6 @@ export const config = {
          * - Images/assets (.svg, .png, .jpg, etc.)
          */
         "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+
     ],
 };

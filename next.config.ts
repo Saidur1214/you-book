@@ -1,13 +1,18 @@
 import type { NextConfig } from "next";
 
+const devAppUrl = process.env.NEXT_PUBLIC_DEVELOPMENT_APP_URL
+    ?.replace(/^https?:\/\//, "")
+    .replace(/\/$/, "");
+
 const nextConfig: NextConfig = {
-  /* config options here */
-  allowedDevOrigins: ["192.168.110.8"], // Add your local network IP here
+  allowedDevOrigins: [
+    "192.168.110.8",
+    "beats-diverse-hormone-pope.trycloudflare.com",
+    ...(devAppUrl ? [devAppUrl] : []),
+  ],
   experimental: {
     agentFeedback: true,
   },
-  cacheComponents: true,
-  partialPrefetching: true,
   turbopack: {
     rules: {
       "*.css": {
@@ -19,3 +24,4 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+
