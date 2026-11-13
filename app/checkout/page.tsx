@@ -3,40 +3,34 @@ import {CheckoutClient} from "./checkout-client";
 import {serverClient} from "@/lib/server";
 import {redirect} from "next/navigation";
 
-async function CheckoutContent({searchParams}: { searchParams: Promise<{ order?: string }>; }) {
+async function CheckoutContent() {
     const supabase = await serverClient();
     const {
         data: {user},
         error,
     } = await supabase.auth.getUser();
 
-    if ( error || !user || !user.email ) {
+    if (error || !user || !user.email) {
         redirect("/log-in");
     }
 
     const userid = user.id;
     const email = user.email;
 
-    const { order } = await searchParams;
-    const orderid = order || crypto.randomUUID();
 
-    return <CheckoutClient orderId={orderid} email={email} userid={userid}/>;
+    return <CheckoutClient userid={userid} email={email}/>;
 }
 
-export default function CheckoutPage({
-                                         searchParams,
-                                     }: {
-    searchParams: Promise<{ order?: string }>
-}) {
+export default function CheckoutPage() {
     return (
         <Suspense
             fallback={
-                <div className="flex min-h-[400px] items-center justify-center text-slate-400">
+                <div className="flex min-h-100 items-center justify-center text-slate-400">
                     Loading checkout...
                 </div>
             }
         >
-            <CheckoutContent searchParams={searchParams}/>
+            <CheckoutContent/>
         </Suspense>
     );
 }

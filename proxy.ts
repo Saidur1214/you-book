@@ -1,5 +1,5 @@
-import { createServerClient } from "@supabase/ssr";
-import { NextResponse, type NextRequest } from "next/server";
+import {createServerClient} from "@supabase/ssr";
+import {NextResponse, type NextRequest} from "next/server";
 
 export async function proxy(request: NextRequest) {
     let response = NextResponse.next({
@@ -15,7 +15,7 @@ export async function proxy(request: NextRequest) {
                     return request.cookies.getAll();
                 },
                 setAll(cookiesToSet) {
-                    cookiesToSet.forEach(({ name, value }) => {
+                    cookiesToSet.forEach(({name, value}) => {
                         request.cookies.set(name, value);
                     });
 
@@ -23,7 +23,7 @@ export async function proxy(request: NextRequest) {
                         request,
                     });
 
-                    cookiesToSet.forEach(({ name, value, options }) => {
+                    cookiesToSet.forEach(({name, value, options}) => {
                         response.cookies.set(name, value, options);
                     });
                 },
@@ -31,29 +31,41 @@ export async function proxy(request: NextRequest) {
         },
     );
 
-    // const { data: { user } } = await supabase.auth.getUser();
-    // const path = request.nextUrl.pathname;
-
-    const { data: { session } } = await supabase.auth.getSession();
-    const user = session?.user;
+    const {
+        data: {user},
+    } = await supabase.auth.getUser();
     const path = request.nextUrl.pathname;
 
-    // Note: Add any route here that should NOT require login
     const publicRoutes = ["/log-in", "/sign-in", "/api/webhooks"];
     const isPublicPath = publicRoutes.some((route) => path.startsWith(route));
 
-    // Block unauthenticated access to ALL private routes
+    const checkoutRoute = ["/checkout"];
+    const InCheckoutRoute = checkoutRoute.some((route) => path.startsWith(route));
+
     if (!user && !isPublicPath) {
         const url = request.nextUrl.clone();
-        url.pathname = "/log-in";
+        url.pathname = "/sign-in";
         return NextResponse.redirect(url);
     }
 
-    // Prevent logged-in users from accessing login/signup screens
-    if (user && isPublicPath) {
-        const url = request.nextUrl.clone();
-        url.pathname = "/";
-        return NextResponse.redirect(url);
+    if (user) {
+        const {data: profile} = await supabase.from("profile").select("status").eq("id", user.id).maybeSingle()
+
+        const activeUser = profile?.status === "active"
+
+
+        if (!activeUser && !InCheckoutRoute) {
+            const url = request.nextUrl.clone();
+            url.pathname = "/checkout"
+            return NextResponse.redirect(url);
+        }
+
+        if (activeUser && (isPublicPath || (InCheckoutRoute && !path.startsWith("/checkout/return")))) {
+            const url = request.nextUrl.clone();
+            url.pathname = "/"
+            return NextResponse.redirect(url);
+        }
+
     }
 
     return response;
