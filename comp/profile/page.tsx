@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import LogoutButton from "../auth/log-out";
 import axios from "axios";
+import Link from "next/link";
 
 export default function Profile() {
     const router = useRouter();
@@ -69,7 +70,19 @@ export default function Profile() {
                         <p>{errorMessage}</p>
                     </div>
                 )}
-                <LogoutButton />
+                <div className="flex flex-col gap-2.5 mt-4 pt-4 border-t border-slate-800">
+                    <Link
+                        href="https://sandbox.whop.com/youb"
+                        className="mt-3 flex items-center justify-center gap-2 w-full bg-slate-800/80 hover:bg-slate-800 border border-slate-700 text-slate-200 hover:text-white font-medium py-2.5 px-4 rounded-xl text-sm transition shadow-sm"
+                    >
+                        <svg className="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                        </svg>
+                        Manage Subscription
+                    </Link>
+
+                    <LogoutButton />
+                </div>
             </div>
         </div>
     );

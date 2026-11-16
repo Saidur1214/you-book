@@ -46,10 +46,7 @@ export default async function Feed() {
                                         A.I
                                     </div>
                                     <div>
-                                        <h3 className="font-medium text-slate-200">{post.user_name || "A.I"}</h3>
-                                        {post.subject && (
-                                            <p className="text-xs text-slate-400">{post.subject}</p>
-                                        )}
+                                        <h3 className="font-medium text-slate-200">{"A.I"}</h3>
                                     </div>
                                 </div>
 

@@ -45,11 +45,11 @@ export async function POST(req: Request) {
                                 },
 
                             },
-                            "Give me summary of this video"
+
                         ]);
                         text = result?.response.text() || "";
                         break;
-                    } catch (err: any) {
+                    } catch (err : any) {
                         attempts--;
                         if (attempts === 0 || err?.status !== 503) throw err;
                         await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -68,8 +68,6 @@ export async function POST(req: Request) {
             .insert([
                 {
                     uid: user.id,
-                    subject: "Video Summary",
-                    user_name: user.user_metadata?.full_name || user.email?.split("@")[0] || null,
                     post: text,
                 }
             ])
