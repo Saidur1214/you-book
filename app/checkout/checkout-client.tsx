@@ -10,7 +10,7 @@ export function CheckoutClient({ userid, email }: { userid: string, email:string
                 <Checkout
                     plan="plan_E7y5DV413eUzB" // your Whop plan ID
                     metadata={{userid}}
-                    returnUrl={`${process.env.NEXT_PUBLIC_DEVELOPMENT_APP_URL}/checkout/return`}
+                    returnUrl={`${process.env.NEXT_PUBLIC_APP_URL}/checkout/return`}
                     onComplete={(completion) => {
                         if (completion.result === "payment") {
                             // Analytics / ad pixels only. Do NOT fulfill here.
